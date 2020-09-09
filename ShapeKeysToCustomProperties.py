@@ -5,6 +5,9 @@
 
 import bpy
 
+# Because it's so ugly
+QUOTE = "\""
+
 # Variable Definition
 context = bpy.context
 obj = bpy.context.object
@@ -14,13 +17,6 @@ other_obj =  [obj for obj in bpy.context.selected_objects if obj.type == 'MESH']
 active_bone = bpy.context.active_pose_bone
 active_bone_name = active_bone.name
 key_number = len(other_obj[0].data.shape_keys.key_blocks)
-
-## Go through Selected Objects and assign the Mesh Object to a variable
-#for s in selected_obj:
-#    if selected_obj[s].type == 'MESH':
-#        other_obj = selected_obj[s]
-#        return other_obj
-#        break
 
 # Error in case Selection does not meet requirements
 def error_selection(self, context):
@@ -34,25 +30,31 @@ if len(selected_obj) == 2 and active_obj.type == 'ARMATURE' and other_obj[0].typ
     for things in selected_obj:
 
         # Iterate over ShapeKey List, Store Names, Add Properties to Active Object, 
-        for i in range(key_number):
-            # Access RNA_UI Dictionary, create if it does not exist
-            if "_RNA_UI" not in active_obj.keys():
-                active_obj['_RNA_UI'] = {}
-            obj_rna_ui = active_obj.get('_RNA_UI')
+        for i in range(1, key_number):
             
             # Store ShapeKey Name
             name_shapekey = other_obj[0].data.shape_keys.key_blocks[i].name
+            
+
             # Add Property with ShapeKey's name to Active PoseBone and set Value to 0
-            active_bone[name_shapekey] = 0.0
+            active_bone[name_shapekey] = 1.0
+            
+            # Access RNA_UI Dictionary of PoseBone, create if it does not exist
+            if "_RNA_UI" not in active_bone.keys():
+                active_bone['_RNA_UI'] = {}
+            act_bone_rna_ui = active_bone.get('_RNA_UI')
+            
             # Add Custom Properties to RNA_UI dictionary, fill values
-            obj_rna_ui[name_shapekey] = {
+            act_bone_rna_ui[name_shapekey] = {
                         "default": 0.0,
                         "min":0.0,
                         "max":1.0, 
-                        "soft_min":0,
-                        "soft_max":1,
-                        "description":"Shape Key Influence"
+                        "soft_min":0.0,
+                        "soft_max":1.0,
+                        "description":"Shape Key Influence",
                         }
+            act_bone_rna_ui[name_shapekey]["min"] = 0.0
+            act_bone_rna_ui[name_shapekey]["max"] = 1.0
 
             # Add the Drivers to the ShapeKeys Value Field, so ttheir influence can be controlled via Custom Properties                  
             driver = other_obj[0].data.shape_keys.key_blocks[i].driver_add("value").driver
