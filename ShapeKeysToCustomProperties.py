@@ -132,15 +132,28 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
         except:
             error_selection(self, context)
 
-def draw(self, context):
-    self.layout.operator("object.shapekeystodrivenprops", text="ShapeKeysToDrivenProps")
+class PANEL_PT_ShapeKeysToDrivenProps(bpy.types.Panel):
+    bl_idname = "panel.panel3"
+    """ShapeKeys to Driven Armature Properties"""
+    bl_idname = "object.shapekeystodrivenprops"
+    bl_label = "ShapeKeys to Driven Armature Properties"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = 'Item'
+    bl_options = {'REGISTER', 'UNDO'}
+ 
+
+    def draw(self, context):
+        self.layout.operator("object.shapekeystodrivenprops", text="ShapeKeysToDrivenProps")
 
 
 def register():
     bpy.utils.register_class(OBJECT_OT_ShapeKeysToDrivenProps)
+    bpy.utils.register_class(PANEL_PT_ShapeKeysToDrivenProps)
 
 
 def unregister():
+    bpy.utils.unregister_class(PANEL_PT_ShapeKeysToDrivenProps)
     bpy.utils.unregister_class(OBJECT_OT_ShapeKeysToDrivenProps)
 
 
