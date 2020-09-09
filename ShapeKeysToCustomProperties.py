@@ -36,9 +36,9 @@ if len(selected_obj) == 2 and active_obj.type == 'ARMATURE' and other_obj[0].typ
         # Iterate over ShapeKey List, Store Names, Add Properties to Active Object, 
         for i in range(key_number):
             # Access RNA_UI Dictionary, create if it does not exist
-            if "_RNA_UI" not in other_obj[0].keys():
-                other_obj[0]['_RNA_UI'] = {}
-            obj_rna_ui = other_obj[0].get('_RNA_UI')
+            if "_RNA_UI" not in active_obj.keys():
+                active_obj['_RNA_UI'] = {}
+            obj_rna_ui = active_obj.get('_RNA_UI')
             
             # Store ShapeKey Name
             name_shapekey = other_obj[0].data.shape_keys.key_blocks[i].name
