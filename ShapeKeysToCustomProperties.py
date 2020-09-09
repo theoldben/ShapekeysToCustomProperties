@@ -28,7 +28,7 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
     bl_label = "ShapeKeys to Driven Armature Properties"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_context = "object"
+    bl_category = 'Item'
     bl_options = {'REGISTER', 'UNDO'}
     
     @classmethod
