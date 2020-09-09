@@ -10,15 +10,16 @@ context = bpy.context
 obj = bpy.context.object
 active_obj = bpy.context.active_object
 selected_obj = bpy.context.selected_objects
-other_obj = ""
-key_number = len(bpy.context.object.data.shape_keys.key_blocks)
+other_obj =  [obj for obj in bpy.context.selected_objects if obj.type == 'MESH']
+active_bone = bpy.context.active_pose_bone
+key_number = len(other_obj[0].data.shape_keys.key_blocks)
 
-# Go through Selected Objects and assign the Mesh Object to a variable
-for s in selected_obj:
-    if selected_obj[s].type == 'MESH':
-        other_obj = selected_obj[s]
-        return other_obj
-        break
+## Go through Selected Objects and assign the Mesh Object to a variable
+#for s in selected_obj:
+#    if selected_obj[s].type == 'MESH':
+#        other_obj = selected_obj[s]
+#        return other_obj
+#        break
 
 # Error in case Selection does not meet requirements
 def error_selection(self, context):
@@ -26,19 +27,23 @@ def error_selection(self, context):
     return {'FINISHED'}
 
 # Check for Object type: Active Object: Armature, Selected Object: Mesh
-if len(selected_obj) == 2 and active_obj.type == 'ARMATURE' and other_obj.type == 'MESH':
+if len(selected_obj) == 2 and active_obj.type == 'ARMATURE' and other_obj[0].type == 'MESH':
 
     # If other objects are in selection: return Error
     for things in selected_obj:
 
         # Iterate over ShapeKey List, Store Names, Add Properties to Active Object, 
-        for i in key_number:
-            obj_rna_ui = obj.get('_RNA_UI')
+        for i in range(key_number):
+            # Access RNA_UI Dictionary, create if it does not exist
+            if "_RNA_UI" not in other_obj[0].keys():
+                other_obj[0]['_RNA_UI'] = {}
+            obj_rna_ui = other_obj[0].get('_RNA_UI')
             # Store ShapeKey Name
-            varI = bpy.context.object.data.shape_keys['Key'].key_blocks[i].name
-            # Add Property with ShapeKey's name to Active Object and set Value to 0
-            obj[varI] = 0.0
-            # Add Custom Properties, fill values
+            varI = other_obj[0].data.shape_keys.key_blocks[i].name
+
+            # Add Property with ShapeKey's name to Active PoseBone and set Value to 0
+            active_bone[varI] = 0.0
+            # Add Custom Properties to RNA_UI dictionary, fill values
             obj_rna_ui[varI] = {
                         "default": 0.0,
                         "min":0.0,
@@ -49,20 +54,20 @@ if len(selected_obj) == 2 and active_obj.type == 'ARMATURE' and other_obj.type =
                         }
 
             # Add the Drivers to the ShapeKeys so they can be controlled via Custom Properties                  
-            driver = bpy.context.object.data.shape_keys['Key'].key_blocks[i].driver_add("value").driver
+            driver = other_obj[0].data.shape_keys.key_blocks[i].driver_add("value").driver
             # Create new input Variable for driver
             driver_var = driver.variables.new()
             # Set number of Variables in the driver stack, since there is only one, that is 0
             target = driver_var.targets[0]
             # Set the Target object for the Driver's Variable Input, i.e. the Mesh Object
-            target.id = other_obj
+            target.id = other_obj[0]
             # Set the drivers Data Path, i.e. the RNA Path to the Property it uses as input
             target.data_path = "[" +"\""+ varI + "\"" +"]"
             # Set the Expression Field of the Driver, in this case with only the variable name
             driver.expression = driver_var.name
 
     # Set ShapeKey Startup Value
-    obj[varI] = 0.0
+    other_obj[0][varI] = 0.0
 
     # property attributes.for UI
     # redraw Properties panel
@@ -74,4 +79,6 @@ if len(selected_obj) == 2 and active_obj.type == 'ARMATURE' and other_obj.type =
                 area.tag_redraw()
                 break
 
-else error_selection()
+else:
+    print("nononono")
+#     error_selection(self, context)
