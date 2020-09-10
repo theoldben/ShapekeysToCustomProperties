@@ -45,9 +45,6 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
     def execute(self, context):
         main(context)
 
-        # Because it's so ugly
-        QUOTE = "\""
-
         # Variable Definition
         context = bpy.context
         obj = bpy.context.object
@@ -91,16 +88,20 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
                         
                         # Add Property with ShapeKey's name to Active PoseBone and set Value to 0
                         active_bone[name_shapekey] = 0.0
+                        # active_bone['_RNA_UI'].update({name_shapekey : 0.0})
                         
                         # Add Custom Properties to RNA_UI dictionary, fill values
-                        act_bone_rna_ui[name_shapekey] = {
-                                    "default": 0.0,
-                                    "min":0.0,
-                                    "max":1.0, 
-                                    "soft_min":0.0,
-                                    "soft_max":1.0,
-                                    "description":"Shape Key Influence",
-                                    }
+                        active_bone['_RNA_UI'].update({name_shapekey : 
+                                                            {
+                                                            "default": 0.0,
+                                                            "min":0.0,
+                                                            "max":1.0, 
+                                                            "soft_min":0.0,
+                                                            "soft_max":1.0,
+                                                            "description":"Shape Key Influence",
+                                                            }
+                                                        }
+                                                    )
                         act_bone_rna_ui[name_shapekey]["min"] = 0.0
                         act_bone_rna_ui[name_shapekey]["max"] = 1.0
 
@@ -108,6 +109,7 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
                         driver = other_obj[0].data.shape_keys.key_blocks[i].driver_add("value").driver
                         # Create new input Variable for driver
                         driver_var = driver.variables.new()
+                        driver_var.name = clean_name_shapekey
                         # Set number of Variables in the driver stack, since there is only one, that is 0
                         target = driver_var.targets[0]
                         # Set the Target object for the Driver's Variable Input, i.e. the Armature Object, where the input sliders are
@@ -115,7 +117,10 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
                         # Set the drivers Data Path, i.e. the RNA Path to the Property it uses as input
                         target.data_path = "pose.bones"+"["+"\""+active_bone.name+"\""+"]"+"[" +"\""+ name_shapekey + "\"" +"]"
                         # Set the Expression Field of the Driver, in this case with the sanitised variable name
-                        driver.expression = driver_var.name = clean_name_shapekey
+                        driver.expression = driver_var.name
+                        # Jiggle the driver to force update
+                        driver.expression += " "
+                        driver.expression = driver.expression[:-1]
 
                 # Set ShapeKey Startup Value
                 other_obj[0][name_shapekey] = 0.0
