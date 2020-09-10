@@ -138,9 +138,8 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
             error_selection(self, context)
 
 class PANEL_PT_ShapeKeysToDrivenProps(bpy.types.Panel):
-    bl_idname = "panel.panel3"
     """ShapeKeys to Driven Armature Properties"""
-    bl_idname = "object.shapekeystodrivenprops"
+    # bl_idname = "panel.shapekeystodrivenprops"
     bl_label = "ShapeKeys to Driven Armature Properties"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
