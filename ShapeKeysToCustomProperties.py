@@ -78,17 +78,17 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
                         alphanumeric_string = "".join(alphanumeric_filter)
                         clean_name_shapekey = alphanumeric_string
 
+                        # Access RNA_UI Dictionary of PoseBone, create if it does not exist
+                        if "_RNA_UI" not in active_bone.keys():
+                            active_bone['_RNA_UI'] = {}
+                        act_bone_rna_ui = active_bone.get('_RNA_UI')
+
                         # If there is already a property with the current shapekey's name, skip
                         if name_shapekey in act_bone_rna_ui:
                             continue
                         
                         # Add Property with ShapeKey's name to Active PoseBone and set Value to 0
                         active_bone[name_shapekey] = 0.0
-
-                        # Access RNA_UI Dictionary of PoseBone, create if it does not exist
-                        if "_RNA_UI" not in active_bone.keys():
-                            active_bone['_RNA_UI'] = {}
-                        act_bone_rna_ui = active_bone.get('_RNA_UI')
                         
                         # Add Custom Properties to RNA_UI dictionary, fill values
                         act_bone_rna_ui[name_shapekey] = {
@@ -111,9 +111,9 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
                         # Set the Target object for the Driver's Variable Input, i.e. the Armature Object, where the input sliders are
                         target.id = active_obj
                         # Set the drivers Data Path, i.e. the RNA Path to the Property it uses as input
-                        target.data_path = "pose.bones"+"["+"\""+active_bone.name+"\""+"]"+"[" +"\""+ clean_name_shapekey + "\"" +"]"
+                        target.data_path = "pose.bones"+"["+"\""+active_bone.name+"\""+"]"+"[" +"\""+ name_shapekey + "\"" +"]"
                         # Set the Expression Field of the Driver, in this case with only the variable name
-                        driver.expression = driver_var.name = "var"
+                        driver.expression = driver_var.name
 
                 # Set ShapeKey Startup Value
                 other_obj[0][name_shapekey] = 0.0
