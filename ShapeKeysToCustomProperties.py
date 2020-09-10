@@ -18,6 +18,11 @@ bl_info = {
 
 import bpy
 
+# Error in case Selection does not meet requirements
+def error_selection(self, context):
+    self.report({'WARNING'}, 'Incorrect Object Selection: Please Select a Mesh Object followed by an Armature Object')
+    return {'FINISHED'}
+
 
 def main(context):
     pass
@@ -35,10 +40,7 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
     def poll(cls, context):
         return context.active_object is not None
 
-    # Error in case Selection does not meet requirements
-    def error_selection(self, context):
-        self.report({'INFO'}, 'Incorrect Object Selection: Please Select a Mesh Object followed by an Armature Object')
-        return {'FINISHED'}
+
     
     def execute(self, context):
         main(context)
@@ -112,8 +114,8 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
                         target.id = active_obj
                         # Set the drivers Data Path, i.e. the RNA Path to the Property it uses as input
                         target.data_path = "pose.bones"+"["+"\""+active_bone.name+"\""+"]"+"[" +"\""+ name_shapekey + "\"" +"]"
-                        # Set the Expression Field of the Driver, in this case with only the variable name
-                        driver.expression = driver_var.name
+                        # Set the Expression Field of the Driver, in this case with the sanitised variable name
+                        driver.expression = driver_var.name = clean_name_shapekey
 
                 # Set ShapeKey Startup Value
                 other_obj[0][name_shapekey] = 0.0
