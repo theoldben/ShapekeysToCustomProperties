@@ -134,6 +134,12 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
                         if area.type == 'PROPERTIES':
                             area.tag_redraw()
                             break
+
+                    for area in screen.areas:
+                        if area.type == 'UI':
+                            area.tag_redraw()
+                            break
+
                 return {'FINISHED'}
             
             else:
@@ -141,6 +147,7 @@ class OBJECT_OT_ShapeKeysToDrivenProps(bpy.types.Operator):
 
         except:
             error_selection(self, context)
+        return {'FINISHED'}
 
 class PANEL_PT_ShapeKeysToDrivenProps(bpy.types.Panel):
     """ShapeKeys to Driven Armature Properties"""
